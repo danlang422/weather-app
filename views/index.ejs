@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather</title>
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+    <% if (locals.weatherData) { %>
+        <h2>
+            The Weather Code: <%= weatherData.code %>
+        </h2>
+    <% } else { %>
+    <h1>Getting your location...</h1>
+    <p>Please allow location access</p>
+    <script>
+        // This JavaScript runs in the BROWSER
+        navigator.geolocation.getCurrentPosition((position) => {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+          
+          // Redirect to your weather route with the coordinates
+          window.location.href = `/weather?lat=${lat}&lon=${lon}`;
+        });
+      </script>
+    <% } %>
+  </body>
+</html>
