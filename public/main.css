@@ -1,0 +1,77 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to bottom, #87CEEB, #E0F6FF);
+    min-height: 100vh;
+}
+
+.weather-app {
+    padding: 20px;
+}
+
+/* The "window" we look through */
+.hourly-container {
+    width: 100%;
+    overflow: hidden;  /* This hides the parts of the strip outside the window */
+    position: relative;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    padding: 20px 0;
+}
+
+/* The "strip of paper" that slides */
+.hourly-slider {
+    display: flex;  /* Lines items up horizontally */
+    transition: transform 0.5s ease;  /* Smooth sliding animation */
+    gap: 10px;  /* Space between items */
+}
+
+/* Each hour block */
+.hour-item {
+    min-width: 100px;
+    flex-shrink: 0;  /* Prevents items from squishing */
+    padding: 15px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+/* Make the current hour stand out */
+.hour-item.current {
+    background: rgba(255, 255, 255, 0.9);
+    transform: scale(1.1);  /* Slightly bigger */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.hour-time {
+    font-size: 14px;
+    margin: 0 0 10px 0;
+    color: #555;
+}
+
+.hour-icon {
+    font-size: 40px;
+    margin: 10px 0;
+    /* Remove the emoji styling if needed */
+}
+
+.hour-temp {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 10px 0 5px 0;
+}
+
+.hour-code {
+    font-size: 12px;
+    color: #666;
+    margin: 0;
+}
+
+/* Details section below */
+.weather-details {
+    margin-top: 30px;
+    text-align: center;
+    color: #333;
+}

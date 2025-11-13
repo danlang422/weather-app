@@ -4,26 +4,88 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.12/css/weather-icons.min.css">
     <link rel="stylesheet" href="main.css">
 </head>
 <body>
     <% if (locals.weatherData) { %>
-        <h2>
-            The Weather Code: <%= weatherData.code %>
-        </h2>
+        <div class="weather-app">
+            <!-- This is our "window" -->
+            <div class="hourly-container">
+                <!-- This is our "strip of paper" -->
+                <div class="hourly-slider" id="hourlySlider">
+                    <% weatherData.hourlyRange.forEach((hour, index) => { %>
+                        <div class="hour-item <%= hour.isCurrent ? 'current' : '' %>" data-index="<%= index %>">
+                            <p class="hour-time"><%= hour.time.toLocaleTimeString('en-US', { hour: 'numeric' }) %></p>
+                            <i class="<%= hour.iconClass %> hour-icon"></i>
+                            <p class="hour-temp"><%= Math.round(hour.temperature) %>°</p>
+                            <p class="hour-code">Code: <%= hour.weatherCode %></p>
+                        </div>
+                    <% }) %>
+                </div>
+            </div>
+            
+            <!-- Details below the scroll -->
+            <div class="weather-details">
+                <h3>Today's Range</h3>
+                <p>High: <%= Math.round(weatherData.todayHigh) %>°F | Low: <%= Math.round(weatherData.todayLow) %>°F</p>
+            </div>
+        </div>
+
+        <!-- Our JavaScript to make it scroll -->
+        <script>
+            // This runs after the page loads
+            function centerCurrentHour() {
+                // 1. Find the container (the "window")
+                const container = document.querySelector('.hourly-container');
+                
+                // 2. Find the slider (the "strip")
+                const slider = document.getElementById('hourlySlider');
+                
+                // 3. Find the current hour item
+                const currentItem = document.querySelector('.hour-item.current');
+                
+                // If we can't find these elements, stop
+                if (!container || !slider || !currentItem) {
+                    console.log("Could not find elements");
+                    return;
+                }
+                
+                // 4. Get measurements we need
+                const containerWidth = container.offsetWidth;  // Width of the window
+                // 5. Calculate where the center of the window is
+                const containerCenter = containerWidth / 2;
+                const itemLeft = currentItem.offsetLeft; // Distance from left edge of slider to current item
+                const itemWidth = currentItem.offsetWidth;     // Width of one hour block
+                const itemCenter = itemLeft + (itemWidth / 2); // Center position of current item
+                
+                console.log("Container center:", containerCenter);
+                console.log("Item center position:", itemCenter);
+                console.log("Container width:", containerWidth);
+                console.log("Item width:", itemWidth);
+                
+                // Slide so the item's center aligns with container's center
+                const slideDistance = containerCenter - itemCenter;
+
+                console.log("Slide distance:", slideDistance);
+
+                slider.style.transform = `translateX(${slideDistance}px)`;
+            }
+            
+            // Run this function when the page loads
+            window.addEventListener('load', centerCurrentHour);
+        </script>
+
     <% } else { %>
-    <h1>Getting your location...</h1>
-    <p>Please allow location access</p>
-    <script>
-        // This JavaScript runs in the BROWSER
-        navigator.geolocation.getCurrentPosition((position) => {
-          const lat = position.coords.latitude;
-          const lon = position.coords.longitude;
-          
-          // Redirect to your weather route with the coordinates
-          window.location.href = `/weather?lat=${lat}&lon=${lon}`;
-        });
-      </script>
+        <h1>Getting your location...</h1>
+        <p>Please allow location access</p>
+        <script>
+            navigator.geolocation.getCurrentPosition((position) => {
+              const lat = position.coords.latitude;
+              const lon = position.coords.longitude;
+              window.location.href = `/weather?lat=${lat}&lon=${lon}`;
+            });
+        </script>
     <% } %>
-  </body>
+</body>
 </html>
