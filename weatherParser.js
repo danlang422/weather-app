@@ -48,12 +48,6 @@ function getCurrentHourForecast(parsedData) {
 function getHourlyRange(parsedData, hoursBefore = 3, hoursAfter = 6, userOffsetMinutes = 0) {
     // Get current time in UTC
     const nowUTC = new Date();
-    console.log("Browser's current time:", now.toString());
-    console.log("Browser's current hour:", now.getHours());
-    console.log("First few forecast times:", parsedData.slice(0, 5).map(f => ({
-        time: f.time.toString(),
-        hour: f.time.getHours()
-    })));
     const serverOffsetMinutes = nowUTC.getTimezoneOffset();
 
     // Calculate the difference and adjust to user's timezone
