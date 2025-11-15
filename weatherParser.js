@@ -4,15 +4,26 @@
  * Parse Open-Meteo hourly data into structured forecast objects
  */
 function parseHourlyData(weatherData) {
-    const hourly = weatherData.hourly; 
+    const hourly = weatherData.hourly;
     
-    return hourly.time.map((time, index) => ({ // map based on time array
-        time: new Date(time), // convert time to Date object
-        temperature: hourly.temperature_2m[index], // 
-        feelsLike: hourly.apparent_temperature[index],
-        precipChance: hourly.precipitation_probability[index],
-        weatherCode: hourly.weather_code[index]
-    }));
+    return hourly.time.map((time, index) => {
+        // Parse as UTC then adjust - the API says these ARE in America/Chicago already
+        // So we treat them as if they're already the correct local time
+        const [date, timeStr] = time.split('T');
+        const [year, month, day] = date.split('-');
+        const [hour, minute] = timeStr.split(':');
+        
+        // Create date using local timezone constructor (this interprets as browser's local time)
+        const localDate = new Date(year, month - 1, day, hour, minute || 0);
+        
+        return {
+            time: localDate,
+            temperature: hourly.temperature_2m[index],
+            feelsLike: hourly.apparent_temperature[index],
+            precipChance: hourly.precipitation_probability[index],
+            weatherCode: hourly.weather_code[index]
+        };
+    });
 }
 
 /**
