@@ -24,7 +24,7 @@ app.get('/', (req, res) => {
 
 app.get("/weather", async (req, res) => {
     try {
-        const { lat, lon } = req.query; // Get latitude and longitude from query parameters req.query.lat, req.query.lon
+        const { lat, lon, tz } = req.query; // Get latitude and longitude from query parameters req.query.lat, req.query.lon
         const timezone = tz || 'auto'; // Get timezone from query parameters or default to 'auto'
         console.log("Requesting weather for:", lat, lon);
         
