@@ -139,7 +139,8 @@
               const lat = position.coords.latitude;
               const lon = position.coords.longitude;
               const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-              window.location.href = `/weather?lat=${lat}&lon=${lon}&tz=${encodeURIComponent(timezone)}`;
+              const offsetMinutes = new Date().getTimezoneOffset();
+              window.location.href = `/weather?lat=${lat}&lon=${lon}&tz=${encodeURIComponent(timezone)}&offset=${offsetMinutes}`;
             });
         </script>
     <% } %>

@@ -24,8 +24,9 @@ app.get('/', (req, res) => {
 
 app.get("/weather", async (req, res) => {
     try {
-        const { lat, lon, tz } = req.query; // Get latitude and longitude from query parameters req.query.lat, req.query.lon
+        const { lat, lon, tz, offset } = req.query; // Get latitude and longitude from query parameters req.query.lat, req.query.lon
         const timezone = tz || 'auto'; // Get timezone from query parameters or default to 'auto'
+        const userOffsetMinutes = parseInt(offset) || 0; // User's timezone offset in minutes
         console.log("Requesting weather for:", lat, lon);
         
         // Fetch weather data from Open-Meteo
@@ -42,7 +43,7 @@ app.get("/weather", async (req, res) => {
         // Parse the data into a more usable format
         const parsedHourly = parseHourlyData(rawData); 
         const currentForecast = getCurrentHourForecast(parsedHourly);
-        const hourlyRange = getHourlyRange(parsedHourly, 12, 18); // hours before, hours after
+        const hourlyRange = getHourlyRange(parsedHourly, 12, 18, userOffsetMinutes); // hours before, hours after
         const { high, low } = getTodayHighLow(parsedHourly);
         const { sunrise, sunset } = getTodaySunTimes(rawData.daily);
 

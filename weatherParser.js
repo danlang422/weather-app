@@ -45,16 +45,22 @@ function getCurrentHourForecast(parsedData) {
  * @param {number} hoursBefore - How many hours before current to include
  * @param {number} hoursAfter - How many hours after current to include
  */
-function getHourlyRange(parsedData, hoursBefore = 3, hoursAfter = 6) {
-    const now = new Date();
+function getHourlyRange(parsedData, hoursBefore = 3, hoursAfter = 6, userOffsetMinutes = 0) {
+    // Get current time in UTC
+    const nowUTC = new Date();
     console.log("Browser's current time:", now.toString());
     console.log("Browser's current hour:", now.getHours());
     console.log("First few forecast times:", parsedData.slice(0, 5).map(f => ({
         time: f.time.toString(),
         hour: f.time.getHours()
     })));
+    const serverOffsetMinutes = nowUTC.getTimezoneOffset();
+
+    // Calculate the difference and adjust to user's timezone
+    const offsetDiff = serverOffsetMinutes - userOffsetMinutes;
+    const nowUserTime = new Date(nowUTC.getTime() + offsetDiff * 60 * 1000);
     const currentIndex = parsedData.findIndex(forecast => 
-        Math.abs(now - forecast.time) < 30 * 60 * 1000 // within 30 minutes; 60,000 ms = 1 min
+        Math.abs(nowUserTime - forecast.time) < 30 * 60 * 1000 // within 30 minutes; 60,000 ms = 1 min
     );
     console.log("Current index found:", currentIndex);
     console.log("Selected current forecast:", parsedData[currentIndex]);
