@@ -25,12 +25,13 @@ app.get('/', (req, res) => {
 app.get("/weather", async (req, res) => {
     try {
         const { lat, lon } = req.query; // Get latitude and longitude from query parameters req.query.lat, req.query.lon
+        const timezone = tz || 'auto'; // Get timezone from query parameters or default to 'auto'
         console.log("Requesting weather for:", lat, lon);
         
         // Fetch weather data from Open-Meteo
         const weatherResponse = await axios.get(
-    `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,apparent_temperature,precipitation_probability,weather_code&daily=sunrise,sunset&past_days=1&forecast_days=3&timezone=auto&temperature_unit=fahrenheit`
-);
+            `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,apparent_temperature,precipitation_probability,weather_code&daily=sunrise,sunset&past_days=1&forecast_days=3&timezone=${timezone}&temperature_unit=fahrenheit`
+        );
         const quoteResponse = await axios.get('https://zenquotes.io/api/random');
         const quote = quoteResponse.data[0]; // Returns an array, get first item
 
