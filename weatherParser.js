@@ -47,9 +47,16 @@ function getCurrentHourForecast(parsedData) {
  */
 function getHourlyRange(parsedData, hoursBefore = 3, hoursAfter = 6) {
     const now = new Date();
+    console.log("Browser's current time:", now.toString());
+    console.log("Browser's current hour:", now.getHours());
+    console.log("First few forecast times:", parsedData.slice(0, 5).map(f => ({
+        time: f.time.toString(),
+        hour: f.time.getHours()
+    })));
     const currentIndex = parsedData.findIndex(forecast => 
         Math.abs(now - forecast.time) < 30 * 60 * 1000 // within 30 minutes; 60,000 ms = 1 min
     );
+    console.log("Current index found:", currentIndex);
     
     if (currentIndex === -1) return parsedData.slice(0, hoursBefore + hoursAfter + 1);
     
