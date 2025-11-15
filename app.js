@@ -36,8 +36,8 @@ app.get("/weather", async (req, res) => {
         const quote = quoteResponse.data[0]; // Returns an array, get first item
 
         const rawData = weatherResponse.data; // Get raw data from response
-        // DEBUG: Check if we got daily data
-        console.log("Daily data:", rawData.daily);
+        console.log("First few time strings from API:", rawData.hourly.time.slice(0, 5));
+        console.log("Timezone from API:", rawData.timezone);
         
         // Parse the data into a more usable format
         const parsedHourly = parseHourlyData(rawData); 
@@ -72,10 +72,6 @@ app.get("/weather", async (req, res) => {
                 author: quote.a
             }
         };
-        // DEBUG: Check if iconClass was added
-        console.log("First hour with icon:", hourlyWithIcons[0]);
-        console.log("Icon class generated:", hourlyWithIcons[0].iconClass);
-        console.log("Processed weather data:", weatherData);
         
         res.render("index.ejs", { weatherData });
     } catch (error) {
