@@ -19,16 +19,32 @@
                             <p class="hour-time"><%= hour.time.toLocaleTimeString('en-US', { hour: 'numeric' }) %></p>
                             <i class="<%= hour.iconClass %> hour-icon"></i>
                             <p class="hour-temp"><%= Math.round(hour.temperature) %>°</p>
-                            <p class="hour-code">Code: <%= hour.weatherCode %></p>
+                            <p class="hour-description"><%= hour.description %></p>
                         </div>
                     <% }) %>
                 </div>
             </div>
-            
+            <div class="controls">
+                    <button id="recenterBtn" class="recenter-button">📍 Now</button>
+            </div>
             <!-- Details below the scroll -->
             <div class="weather-details">
+                
                 <h3>Today's Range</h3>
                 <p>High: <%= Math.round(weatherData.todayHigh) %>°F | Low: <%= Math.round(weatherData.todayLow) %>°F</p>
+                <% if (weatherData.sunrise && weatherData.sunset) { %>
+                    <div class="sun-times">
+                        <span>🌅 Sunrise: <%= weatherData.sunrise.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) %></span>
+                        <span> | </span>
+                        <span>🌇 Sunset: <%= weatherData.sunset.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) %></span>
+                    </div>
+                <% } %>
+                <% if (weatherData.quote) { %>
+                    <div class="daily-quote">
+                        <p class="quote-text">"<%= weatherData.quote.text %>"</p>
+                        <p class="quote-author">— <%= weatherData.quote.author %></p>
+                    </div>
+                <% } %>
             </div>
         </div>
 
@@ -64,16 +80,60 @@
                 console.log("Container width:", containerWidth);
                 console.log("Item width:", itemWidth);
                 
-                // Slide so the item's center aligns with container's center
-                const slideDistance = containerCenter - itemCenter;
+                // Calculate how far to scroll
+                const scrollPosition = itemCenter - containerCenter;
+        
+                // Use scrollLeft instead of transform (works better with scrollable containers)
+                container.scrollLeft = scrollPosition;
+            }
 
-                console.log("Slide distance:", slideDistance);
-
-                slider.style.transform = `translateX(${slideDistance}px)`;
+            // NEW: Add drag-to-scroll functionality
+            function initDragScroll() {
+                const container = document.querySelector('.hourly-container');
+                console.log("Drag scroll initialized, container:", container); // DEBUG
+                let isDown = false;
+                let startX;
+                let scrollLeft;
+                
+                container.addEventListener('mousedown', (e) => {
+                    isDown = true;
+                    container.style.cursor = 'grabbing';
+                    startX = e.pageX - container.offsetLeft;
+                    scrollLeft = container.scrollLeft;
+                });
+                
+                container.addEventListener('mouseleave', () => {
+                    isDown = false;
+                    container.style.cursor = 'grab';
+                });
+                
+                container.addEventListener('mouseup', () => {
+                    isDown = false;
+                    container.style.cursor = 'grab';
+                });
+                
+                container.addEventListener('mousemove', (e) => {
+                    if (!isDown) return;
+                    e.preventDefault();
+                    const x = e.pageX - container.offsetLeft;
+                    const walk = (x - startX) * 2; // Scroll speed multiplier
+                    container.scrollLeft = scrollLeft - walk;
+                });
             }
             
             // Run this function when the page loads
-            window.addEventListener('load', centerCurrentHour);
+            window.addEventListener('load', () => {
+                centerCurrentHour();
+                initDragScroll();
+            });
+
+            // Add click handler for the recenter button
+            document.addEventListener('DOMContentLoaded', () => {
+            const recenterBtn = document.getElementById('recenterBtn');
+            if (recenterBtn) {
+                recenterBtn.addEventListener('click', centerCurrentHour);
+            }
+        });
         </script>
 
     <% } else { %>

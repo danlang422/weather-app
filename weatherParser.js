@@ -4,11 +4,11 @@
  * Parse Open-Meteo hourly data into structured forecast objects
  */
 function parseHourlyData(weatherData) {
-    const hourly = weatherData.hourly;
+    const hourly = weatherData.hourly; 
     
-    return hourly.time.map((time, index) => ({
-        time: new Date(time),
-        temperature: hourly.temperature_2m[index],
+    return hourly.time.map((time, index) => ({ // map based on time array
+        time: new Date(time), // convert time to Date object
+        temperature: hourly.temperature_2m[index], // 
         feelsLike: hourly.apparent_temperature[index],
         precipChance: hourly.precipitation_probability[index],
         weatherCode: hourly.weather_code[index]
@@ -37,7 +37,7 @@ function getCurrentHourForecast(parsedData) {
 function getHourlyRange(parsedData, hoursBefore = 3, hoursAfter = 6) {
     const now = new Date();
     const currentIndex = parsedData.findIndex(forecast => 
-        Math.abs(now - forecast.time) < 30 * 60 * 1000 // within 30 minutes
+        Math.abs(now - forecast.time) < 30 * 60 * 1000 // within 30 minutes; 60,000 ms = 1 min
     );
     
     if (currentIndex === -1) return parsedData.slice(0, hoursBefore + hoursAfter + 1);
@@ -169,6 +169,32 @@ function getWeatherIcon(code, isDay) {
     return prefix + iconName;
 }
 
+/**
+ * Get today's sunrise and sunset times
+ * @param {Object} dailyData - The daily data from Open-Meteo
+ */
+function getTodaySunTimes(dailyData) {
+    if (!dailyData || !dailyData.sunrise || !dailyData.sunset) {
+        return { sunrise: null, sunset: null };
+    }
+    
+    // Get today's date string (YYYY-MM-DD)
+    const today = new Date();
+    const dateString = today.toISOString().split('T')[0];
+    
+    // Find today in the daily data
+    const dayIndex = dailyData.time.findIndex(d => d === dateString);
+    
+    if (dayIndex === -1) {
+        return { sunrise: null, sunset: null };
+    }
+    
+    // Return Date objects for sunrise and sunset
+    return {
+        sunrise: new Date(dailyData.sunrise[dayIndex]),
+        sunset: new Date(dailyData.sunset[dayIndex])
+    };
+}
 // UPDATED EXPORT - includes the two new functions
 export {
     parseHourlyData,
@@ -177,5 +203,6 @@ export {
     getTodayHighLow,
     getWeatherDescription,
     isDaytime,
-    getWeatherIcon
+    getWeatherIcon,
+    getTodaySunTimes
 };

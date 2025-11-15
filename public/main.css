@@ -11,13 +11,34 @@ body {
 }
 
 /* The "window" we look through */
+/* Hide scrollbar but keep scrolling functionality */
 .hourly-container {
     width: 100%;
-    overflow: hidden;  /* This hides the parts of the strip outside the window */
+    overflow-x: auto;
+    overflow-y: hidden;
     position: relative;
     background: rgba(255, 255, 255, 0.3);
     border-radius: 10px;
     padding: 20px 0;
+    scroll-behavior: smooth;
+    cursor: grab;  /* Shows it's draggable */
+    
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+
+    /* Prevent text selection while dragging */
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+}
+
+.hourly-container::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari, Opera */
+}
+
+.hourly-container:active {
+    cursor: grabbing;  /* Changes cursor when dragging */
 }
 
 /* The "strip of paper" that slides */
@@ -63,10 +84,10 @@ body {
     margin: 10px 0 5px 0;
 }
 
-.hour-code {
+.hour-description {
     font-size: 12px;
-    color: #666;
-    margin: 0;
+    color: #555;
+    margin: 5px 0 0 0;
 }
 
 /* Details section below */
@@ -74,4 +95,60 @@ body {
     margin-top: 30px;
     text-align: center;
     color: #333;
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    margin: 15px 0;
+}
+
+.recenter-button {
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 20px;
+    padding: 10px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+}
+
+.recenter-button:hover {
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transform: translateY(-1px);
+}
+
+.recenter-button:active {
+    transform: translateY(0);
+}
+
+.sun-times {
+    margin-top: 10px;
+    font-size: 16px;
+    color: #555;
+}
+
+.daily-quote {
+    margin-top: 30px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+    border-left: 4px solid rgba(100, 150, 200, 0.8);
+}
+
+.quote-text {
+    font-size: 22px;
+    font-style: italic;
+    font-family: cursive;
+    color: #333;
+    margin: 0 0 10px 0;
+}
+
+.quote-author {
+    font-size: 14px;
+    color: #666;
+    text-align: right;
+    margin: 0;
 }

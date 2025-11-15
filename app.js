@@ -1,18 +1,19 @@
 import express from 'express';
 import axios from 'axios';
 import bodyParser from 'body-parser';
-import { 
+import { // Import parsing functions from weatherParser.js
     parseHourlyData, 
     getCurrentHourForecast,
     getHourlyRange,
     getTodayHighLow,
     getWeatherDescription,
     isDaytime,
-    getWeatherIcon
+    getWeatherIcon,
+    getTodaySunTimes
 } from './weatherParser.js';
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
@@ -23,28 +24,32 @@ app.get('/', (req, res) => {
 
 app.get("/weather", async (req, res) => {
     try {
-        const { lat, lon } = req.query;
+        const { lat, lon } = req.query; // Get latitude and longitude from query parameters req.query.lat, req.query.lon
         console.log("Requesting weather for:", lat, lon);
         
         // Fetch weather data from Open-Meteo
         const weatherResponse = await axios.get(
     `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,apparent_temperature,precipitation_probability,weather_code&daily=sunrise,sunset&past_days=1&forecast_days=3&timezone=auto&temperature_unit=fahrenheit`
 );
-        
-        const rawData = weatherResponse.data;
+        const quoteResponse = await axios.get('https://zenquotes.io/api/random');
+        const quote = quoteResponse.data[0]; // Returns an array, get first item
+
+        const rawData = weatherResponse.data; // Get raw data from response
         // DEBUG: Check if we got daily data
         console.log("Daily data:", rawData.daily);
         
         // Parse the data into a more usable format
-        const parsedHourly = parseHourlyData(rawData);
+        const parsedHourly = parseHourlyData(rawData); 
         const currentForecast = getCurrentHourForecast(parsedHourly);
-        const hourlyRange = getHourlyRange(parsedHourly, 6, 7); // hours before, hours after
+        const hourlyRange = getHourlyRange(parsedHourly, 12, 18); // hours before, hours after
         const { high, low } = getTodayHighLow(parsedHourly);
+        const { sunrise, sunset } = getTodaySunTimes(rawData.daily);
 
-        // Add icon classes to each hour
+        // Add icon classes and descriptions to each hour
         const hourlyWithIcons = hourlyRange.map(hour => ({
             ...hour,
-            iconClass: getWeatherIcon(hour.weatherCode, isDaytime(hour.time, rawData.daily))
+            iconClass: getWeatherIcon(hour.weatherCode, isDaytime(hour.time, rawData.daily)),
+            description: getWeatherDescription(hour.weatherCode)
 }));
         
         // Package everything
@@ -57,8 +62,14 @@ app.get("/weather", async (req, res) => {
             hourlyRange: hourlyWithIcons,
             todayHigh: high,
             todayLow: low,
+            sunrise: sunrise,
+            sunset: sunset,
             timezone: rawData.timezone,
-            units: rawData.hourly_units
+            units: rawData.hourly_units,
+            quote: {
+                text: quote.q,
+                author: quote.a
+            }
         };
         // DEBUG: Check if iconClass was added
         console.log("First hour with icon:", hourlyWithIcons[0]);
