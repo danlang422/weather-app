@@ -57,6 +57,7 @@ function getHourlyRange(parsedData, hoursBefore = 3, hoursAfter = 6) {
         Math.abs(now - forecast.time) < 30 * 60 * 1000 // within 30 minutes; 60,000 ms = 1 min
     );
     console.log("Current index found:", currentIndex);
+    console.log("Selected current forecast:", parsedData[currentIndex]);
     
     if (currentIndex === -1) return parsedData.slice(0, hoursBefore + hoursAfter + 1);
     
