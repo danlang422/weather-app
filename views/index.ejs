@@ -10,9 +10,9 @@
 <body>
     <% if (locals.weatherData) { %>
         <div class="weather-app">
-            <!-- This is our "window" -->
+            <!-- This is the "window" -->
             <div class="hourly-container">
-                <!-- This is our "strip of paper" -->
+                <!-- This is the "strip of paper" -->
                 <div class="hourly-slider" id="hourlySlider">
                     <% weatherData.hourlyRange.forEach((hour, index) => { %>
                         <div class="hour-item <%= hour.isCurrent ? 'current' : '' %>" data-index="<%= index %>">
@@ -48,7 +48,7 @@
             </div>
         </div>
 
-        <!-- Our JavaScript to make it scroll -->
+        <!-- JavaScript to make it scroll -->
         <script>
             // This runs after the page loads
             function centerCurrentHour() {
@@ -67,7 +67,7 @@
                     return;
                 }
                 
-                // 4. Get measurements we need
+                // 4. Get measurements 
                 const containerWidth = container.offsetWidth;  // Width of the window
                 // 5. Calculate where the center of the window is
                 const containerCenter = containerWidth / 2;
