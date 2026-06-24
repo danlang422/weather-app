@@ -131,6 +131,10 @@
         });
         </script>
 
+    <% } else if (locals.error) { %>
+        <h1>Something went wrong</h1>
+        <p><%= error %></p>
+        <p><a href="/">Try again</a></p>
     <% } else { %>
         <h1>Getting your location...</h1>
         <p>Please allow location access</p>

@@ -13,7 +13,7 @@ import { // Import parsing functions from weatherParser.js
 } from './weatherParser.js';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3456;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
@@ -33,8 +33,14 @@ app.get("/weather", async (req, res) => {
         const weatherResponse = await axios.get(
             `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,apparent_temperature,precipitation_probability,weather_code&daily=sunrise,sunset&past_days=1&forecast_days=3&timezone=${timezone}&temperature_unit=fahrenheit`
         );
-        const quoteResponse = await axios.get('https://zenquotes.io/api/random');
-        const quote = quoteResponse.data[0]; // Returns an array, get first item
+        let quote = null;
+        try {
+            const quoteResponse = await axios.get('https://zenquotes.io/api/random');
+            quote = quoteResponse.data[0]; // Returns an array, get first item
+        } catch (quoteError) {
+            console.error("Error fetching quote:", quoteError.message);
+            quote = null;
+        }
 
         const rawData = weatherResponse.data; // Get raw data from response
         console.log("First few time strings from API:", rawData.hourly.time.slice(0, 5));
@@ -68,16 +74,19 @@ app.get("/weather", async (req, res) => {
             sunset: sunset,
             timezone: rawData.timezone,
             units: rawData.hourly_units,
-            quote: {
+            quote: quote ? {
                 text: quote.q,
                 author: quote.a
-            }
+            } : null
         };
-        
+
         res.render("index.ejs", { weatherData });
     } catch (error) {
         console.error("Error fetching weather:", error.message);
-        res.render("index.ejs", { weatherData: null, error: "Could not fetch weather data" });
+        const message = error.response?.status === 429
+            ? "Weather API rate limit hit — try again in a moment."
+            : "Could not fetch weather data";
+        res.render("index.ejs", { weatherData: null, error: message });
     }
 });
 
